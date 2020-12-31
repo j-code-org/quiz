@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>プログラミング教育研究所</title>
+<link rel="stylesheet" href="https://j-code.org/css/bulma.css">
+<link rel="stylesheet" href="https://j-code.org/css/style.css">
+<style>
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+html {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.btn,
+a.btn,
+button.btn {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.5;
+  position: relative;
+  display: inline-block;
+  padding: 1rem 4rem;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  color: #212529;
+  border-radius: 0.5rem;
+}
+
+.entrygamebtn {
+    margin: 20px;
+}
+
+a.btn-emergency {
+  position: relative;
+
+  display: block;
+
+  width: 100px;
+  height: 65x;
+  margin: 0 auto;
+}
+
+a.btn-emergency:hover .btn-emergency-top {
+  top: 5px;
+  height: 25px;
+}
+
+a.btn-emergency:active .btn-emergency-top {
+  top: 10px;
+  height: 20px;
+}
+
+.btn-emergency-top {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  width: 80px;
+  height: 30px;
+  margin-top: 15px;
+
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  border-radius: 0 0 50% 50%;
+  background: #d62d2d;
+}
+
+.btn-emergency-top:before {
+  position: absolute;
+  top: -15px;
+  left: 0;
+  width: 80px;
+  height: 30px;
+
+  content: "";
+  border-radius: 40px / 15px;
+  background: #ed4c4c;
+}
+
+.btn-emergency-top span {
+  font-size: 19px;
+  font-weight: bold;
+
+  position: absolute;
+  top: -12px;
+  left: 0;
+
+  width: 100%;
+
+  -webkit-transform: scaleY(0.75);
+  transform: scaleY(0.75);
+  text-align: center;
+  color: #f6a3a3;
+}
+
+.btn-emergency-bottom {
+  position: absolute;
+  top: 19px;
+  left: 0;
+  width: 100px;
+  height: 40px;
+
+  border-radius: 50px / 20px;
+  background: #d8e4ea;
+  -webkit-box-shadow: 0 4px 0 #c4cacc;
+  box-shadow: 0 4px 0 #c4cacc;
+}
+.absolute_parent {
+    position:  relative;        /* 要素の配置方法をと子要素の起点を指定 */
+    left:  0px;                /* 左からの表示位置 */
+    top: 0px;                  /* 上からの表示位置 */
+    border: none;      /* 枠線指定 */
+    height:  480px;             /* 高さ指定 */
+    width: 100%;               /* 幅指定 */
+}
+.imgwaku {
+    max-width: 100%;
+    height: auto;
+    padding: 0px;
+    width: 100%;               /* 幅指定 */
+    text-align : center;
+}
+
+#image2outer {
+    position: absolute;
+    max-width: 100%;
+    height: auto;
+    top: 0px;
+    left: 0px;
+    padding: 0px;
+    line-height: 1.2;
+    width: 100%;               /* 幅指定 */
+    display:none;
+    text-align : center;
+}
+#serverpanel {
+    position: absolute;
+    max-width: 100%;
+    top: 0px;
+    left: 0px;
+    padding: 0px;
+    line-height: 1.2;
+    width: 100%;               /* 幅指定 */
+    text-align : center;
+    height: 500px;
+    z-index: 1000;
+    background: white;
+}
+#server-list {
+    margin: 1em;
+    padding: 1em;
+}
+
+.overlap {
+    position: absolute;
+    max-width: 100%;
+    height: auto;
+    bottom: 1px;
+    right: 1px;
+    padding: 0px;
+    line-height: 1.2;
+    width: 100%;               /* 幅指定 */
+}
+.mondai {
+    text-align: center;
+    background-color: rgb(255, 255, 255, 0.7);
+	color: black;
+    padding: 0px;
+}
+
+    .quiz {
+        font-size: 2rem;
+        margin: 0.5em;
+        padding: 0.2em;
+        line-height: 1.2em;
+    }
+    .button-a {
+        background-color: lightblue;
+        border-color: gray;
+    }
+    .button-b {
+        background-color: darkorange;
+        border-color: gray;
+    }
+    .selected-button {
+        border-width: 8px;
+        border-color: gold;
+    }
+
+.button-2 {
+	position: relative;
+	display: inline;
+	width: 20px;
+	height: 20px;
+	margin: 5px;
+	border-radius: 20px;
+	background: #04DDFD;
+    text-align: center;
+	}
+
+
+.button-2 .ring {
+	background: rgba(181, 244, 253, 0.8);
+	position: absolute;
+	z-index: 100;
+	border-radius: 20px;
+/* センター揃えとリングの大きさ */
+	height: 20px;
+	width: 20px;
+	top: -10px;
+	left: -10px;
+}
+.pulsate-2 .ring {
+    animation-name: pulsate2;
+    animation-duration: 1s;
+    animation-timing-function: ease-out;
+	animation-iteration-count: 1;
+}
+@keyframes pulsate2 {
+	0% {transform: scale(1, 1); opacity: 1;}
+	100% {transform: scale(5, 5); opacity: 0;}
+}
+table {
+    border-collapse: collapse;
+    border: 0px solid black;
+}
+table td,
+table th {
+    text-align: center;
+    vertical-align: middle;  /* 中央揃え */
+}
+.tr-btn{
+    height: 100px;
+}
+</style>
+</head>
+<body>
+
+<div>
+    <main class="columns">
+        <div class="submenu column is-3">
+            <aside>
+                <h3><a href="https://j-code.org">プログラミング教育研究所</a></h3>
+                <p>
+                    <input class="input" type="text" name="username" id="username">
+                </p>
+
+            </aside>
+        </div>
+        <div class="column">
+            <div class="absolute_parent">
+                <div class="imgwaku">
+                    <img src="white.jpg" alt="" id="image1">
+                </div>
+                <div id="image2outer">
+                    <img src="undoukai_tsunahiki_10099.png" id="image2">
+                </div>
+                <div id="serverpanel">
+                    <p>
+                        ゲームにようこそ<br />
+                    </p>
+                    <div id="server-list">
+                        <p><a class="button is-info entrygamebtn" onclick="location.reload();">もういちどサーバーを探す</a></p>
+                    </div>
+                    <p>
+                        <a class="button" href="https://j-code.org/users/student"><ruby>会員<rt>かいいん</rt></ruby>ページにもどる</a><br />
+                    </p>
+                </div>
+                <div class="overlap">
+                    <p class="quiz">
+                        <span class="mondai" id="text1">
+                        </span>
+                    </p>
+                    <table>
+                        <tr>
+                            <td>
+                                <a class="button-2" href="#" id="button_a2">
+                                    <span class="ring">A</span>
+                                </a>
+                                <button type="button" name="aaa" value="aaa" id="button_a" class="quiz button-a" >
+                                A
+                                </button>
+                            </td>
+                            <td>
+                                <a class="button-2" href="#" id="button_b2">
+                                    <span class="ring">B</span>
+                                </a>
+                                <button type="button" name="aaa" value="aaa" id="button_b" class="quiz button-b" >
+                                B
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="tr-btn">
+                            <td>
+                                <a class="btn-emergency" id="push_a">
+                                <span class="btn-emergency-bottom"></span>
+                                <span class="btn-emergency-top"><span>A</span></span>
+                                </a>
+                            </td>
+                            <td>
+                                <a class="btn-emergency" id="push_b">
+                                <span class="btn-emergency-bottom"></span>
+                                <span class="btn-emergency-top"><span>B</span></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="resultlist"></div>
+            <br />
+
+       </div>
+        <div class="submenu column is-3">
+            <aside></aside>
+        </div>
+    </main>
+ 
+<script>
+/*
+ * URL解析して、クエリ文字列を返す
+ * @returns {Array} クエリ文字列
+ */
+ function getUrlVars() {
+    var vars = [], hash = "", array = "";
+    var url = window.location.search;
+    //?を取り除くため、1から始める。複数のクエリ文字列に対応するため、&で区切る
+    hash  = url.slice(1).split('&');    
+    for (var i = 0; i < hash.length; i++) {
+        array = hash[i].split('=');    //keyと値に分割。
+        vars.push(array[0]);    //末尾にクエリ文字列のkeyを挿入。
+        vars[array[0]] = array[1];    //先ほど確保したkeyに、値を代入。
+    }
+    return vars;
+}
+// Global vars
+var urlvars = getUrlVars();
+var servername = urlvars["server"];
+var roomname = urlvars["room"];
+var username = decodeURI(urlvars["user"]);
+document.getElementById("username").value = username;
+
+    // クラスを設定して、アニメーションを開始する
+    var timerList = {}
+    function hitPuls(id, cls) {
+        if (timerList[id]) {
+            clearTimeout(timerList[id]);
+            timerList[id] = null;
+            document.getElementById(id).classList.remove(cls);
+        }
+        setTimeout(function(){
+            document.getElementById(id).classList.add(cls);
+            timerList[id] = setTimeout(function(){
+                document.getElementById(id).classList.remove(cls);
+            }, 1000);
+        },100);
+    }
+    // WebSocketのクライアントの生成
+    var wsock = new WebSocket(servername)
+    var serverid = null;
+
+    // ボタンクリック時に呼ばれる
+    document.getElementById('push_a').addEventListener('click', e => {
+        wsock.send(JSON.stringify({
+            MSGTYPE: "MESSAGE",
+            type: "answer?",
+            sendto: serverid,
+            answer: "A",
+        }));
+        document.getElementById("button_a").classList.add("selected-button");
+        document.getElementById("button_b").classList.remove("selected-button");
+    })
+    document.getElementById('push_b').addEventListener('click', e => {
+        wsock.send(JSON.stringify({
+            MSGTYPE: "MESSAGE",
+            type: "answer?",
+            sendto: serverid,
+            answer: "B"
+        }));
+        document.getElementById("button_b").classList.add("selected-button");
+        document.getElementById("button_a").classList.remove("selected-button");
+    })
+
+    // socket接続したらroomに接続
+    wsock.addEventListener('open', e => {
+        console.log('open');
+        // room に接続
+        wsock.send(JSON.stringify({
+            MSGTYPE: "JOIN",
+            room: roomname,
+        }));
+        // 部屋にサーバーがいるか確認
+        wsock.send(JSON.stringify({
+            MSGTYPE: "MESSAGE",
+            type: "server?",
+            name: document.getElementById("username").value,
+        }));
+    })
+    // socket切断したら終わり
+    wsock.addEventListener('close', e => {
+        location.reload();
+    })
+
+    // サーバからのデータ受信時に呼ばれる
+    wsock.addEventListener('message', e => {
+        console.log(e.data)
+        var msg = {};
+        try {
+            msg = JSON.parse(e.data)
+        } catch (error) {
+            return;
+        }
+        switch (msg.type) {
+        case "server!": // サーバーから返事が来たので、join を出す
+            serverid = msg.from;　// サーバーのIDを保管する
+            document.getElementById("serverpanel").style.display = "none"; // サーバーリストを非表示
+            console.log("serveropen", serverid)
+            break;
+        case "question!":
+            var q = msg.question;
+            document.getElementById("image1").src = q.image1;
+            document.getElementById("text1").innerText = q.text1;
+            document.getElementById("button_a").innerText = q.A;
+            document.getElementById("button_b").innerText = q.B;
+            document.getElementById("button_a").classList.remove("selected-button");
+            document.getElementById("button_b").classList.remove("selected-button");
+            if (q.image2) {
+                document.getElementById("image2outer").style.left = "0px";
+                document.getElementById("image2outer").style.display = "block";
+                document.getElementById("image2").src = q.image2;
+            } else {
+                document.getElementById("image2outer").style.display = "none";
+            }
+            break;
+        case "answer!":
+            var data = msg.data;
+            if (data.answer == "A") {
+                hitPuls("button_a2", "pulsate-2")
+            }
+            if (data.answer == "B") {
+                hitPuls("button_b2", "pulsate-2")
+            }
+            var count = data.count_b - data.count_a;
+            document.getElementById("image2outer").style.left = (count)+ "px";
+            break;
+        case "result!":
+            var q = msg.result;
+            document.getElementById("image1").src = q.image1;
+            document.getElementById("text1").innerText = q.text1;
+            break;
+        case "resultslist!":
+            var html = "<table>"
+            html += "<tr><td>もんだい</td><td>こたえ</td><td>けっか</td></tr>"
+            msg.resultslist.forEach(u =>{
+                html += "<tr><td>"+u.question+"</td><td>"+(u.answer || "")+"</td><td>"+ (u.result?"○":"×") +"</td></tr>"
+            })
+            html += "</table>"
+            document.getElementById("resultlist").innerHTML = html;
+            break;
+        default:
+            break;
+        }
+    })
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>プログラミング教育研究所</title>
+<link rel="stylesheet" href="https://j-code.org/css/bulma.css">
+</head>
+<body>
+    <div>
+        <main class="columns">
+            <div class="submenu column is-3">
+                <aside>
+                    <p>
+                        現在のクイズ:
+                         <input class="input" name="gamename" type="text" id="gamename" onchange="connect();">
+                    </p>
+                    <figure class="image is-3by2">
+                        <img src="white.jpg" alt="" id="image1">
+                    </figure>
+                    <p class="mondai" id="text1">
+                    </p>
+                    <p>
+                        A: <span class="mondai" id="A"></span>
+                    </p>
+                    <p>
+                        B: <span class="mondai" id="B"></span>
+                    </p>
+                    <div class="field has-addons">
+                        <div class="control">
+                            正解
+                        </div>
+                        <div class="control">
+                            <input class="input" name="correct" type="text" id="correct">
+                        </div>
+                        <div class="control">
+                            <a class="button is-warning" onclick="changeAnswer();">A/B変更</a>
+                        </div>
+                    </div>
+                    <a id="result_send" class="button is-danger" onclick="makeResult();">回答締切・答え合わせ</a>
+                    <br />
+                </aside>
+            </div>
+            <div class="column">
+         <br />
+    
+        <h2>次の問題</h2>
+        <article class="media">
+        <figure class="media-left">
+            <p class="image is-64x64">
+            <img src="white.jpg" alt="" id="image102">
+            </p>
+        </figure>
+        <div class="media-content">
+            <nav class="level is-mobile">
+            <div class="level-left">
+                <select class="level-item" id="question" onchange="changeQuestion2();">
+                    <option value="tsunahiki">綱引き</option>
+                    <option value="">選択してください</option>
+                    <option value="q0">CLEAR</option>
+                </select>
+                <a class="level-item button" id="" onclick="backQuestion();">戻る</a>
+                <a class="level-item button" id="" onclick="nextQuestion();">次へ</a>
+                <a class="level-item button is-info" id="image1_send" onclick="clearAndSendQuestion();">問題に決定送信</a>
+            </div>
+            </nav>
+            <div class="content">
+                    <p class="mondai" id="text102">
+                    </p>
+                    <p>
+                        A: <span class="mondai" id="A02"></span><br />
+                        B: <span class="mondai" id="B02"></span><br />
+                        正解: <span class="mondai" id="correct02"></span>
+                    </p>
+            </div>
+        </div>
+        <div class="media-right">
+            <button class="delete"></button>
+        </div>
+        </article>
+    
+        <br />
+        <H1>現在の状況</H1>
+        <div id="userlist"></div>
+        <br />
+    
+        <H1>結果一覧</H1>
+        <div id="resultlist"></div>
+        <br />
+    
+    
+           </div>
+            <div class="submenu column is-3">
+                <aside></aside>
+            </div>
+        </main>
+     
+     <script>
+/*
+ * URL解析して、クエリ文字列を返す
+ * @returns {Array} クエリ文字列
+ */
+ function getUrlVars() {
+    var vars = [], hash = "", array = "";
+    var url = window.location.search;
+    //?を取り除くため、1から始める。複数のクエリ文字列に対応するため、&で区切る
+    hash  = url.slice(1).split('&');    
+    for (var i = 0; i < hash.length; i++) {
+        array = hash[i].split('=');    //keyと値に分割。
+        vars.push(array[0]);    //末尾にクエリ文字列のkeyを挿入。
+        vars[array[0]] = array[1];    //先ほど確保したkeyに、値を代入。
+    }
+    return vars;
+}
+// Global vars
+var urlvars = getUrlVars();
+var servername = urlvars["server"];
+var roomname = urlvars["room"];
+var jsonFileName = "quiz.json";
+
+document.getElementById("gamename").value = "クイズ大会2020";
+    
+    class Elapse {
+        constructor() {
+            this.t1 = (new Date()).getTime();
+        }
+        clear() {
+            this.t1 = (new Date()).getTime();
+        }
+        time () {
+            var t2 = (new Date()).getTime()
+            return Math.floor((t2 - this.t1)/100) / 10;
+        }
+    }
+    var timestamp = new Elapse();
+
+
+    class OneResult {
+        constructor(id) {
+            this.userid = id;
+        }
+        clear() { // 現在の状態を消去
+            this.answer = "-";
+            this.timestamp = 0;
+        }
+        setUsername(username) { // ユーザー名を設定
+            this.username = username;
+        }
+        setAnswer(answer) { // 回答、回答時間、クリック数を記録
+            if (this.answer != answer) {
+                this.answer = answer;
+                this.timestamp = timestamp.time();
+            }
+            if (this[answer]) {
+                this[answer] += 1;
+            } else {
+                this[answer] = 1;
+            }
+        }
+        getResult(question, correct) {
+            this.question = question;
+            this.correct = correct;
+            this.result = (this.correct == this.answer)
+            return this.result;
+        }
+    }
+    
+    class ResultList {
+        constructor() {
+            this.lst = new Object();
+            this.users = []
+            this.resultlist = []
+        }
+        clear() { // 現在の状態を消去
+            this.users.forEach(usr=>{
+                usr.clear();
+            })
+        }
+        push() { // 現在の状態を履歴に退避
+            this.resultlist.push(JSON.parse(JSON.stringify(this.users)))
+        }
+        getResultlist() { // 履歴配列を返す
+            return this.resultlist;
+        }
+        // ユーザー一覧の表示
+        htmlUserlist(userlist) {
+            var html = "<table>"
+            html += "<tr><td>もんだい</td><td>なまえ</td><td>こたえ</td><td>秒</td><td>けっか</td></tr>"
+            userlist.forEach(u=>{
+                html += "<tr><td>"+u.question+"</td><td>"+u.username+"</td><td>"+u.answer+"</td><td>"+u.timestamp+"</td><td>"+ (u.result?"○":"×") +"</td></tr>"
+            })
+            html += "</table>"
+            return html;
+        }
+        htmlUsers() {
+            return this.htmlUserlist(this.users);   
+        }
+        // 採点結果を表示
+        htmlResultsList() {
+            var html = ""
+            this.resultlist.forEach(userlist =>{
+                html += this.htmlUserlist(userlist) + "<br />";
+            })
+            return html;
+        }
+        addUser(id) { // User追加
+            if (!this.lst[id]) {
+                var usr = new OneResult(id);
+                this.users.push(usr)
+                this.lst[id] = usr;
+            }
+            return this.lst[id];
+        }
+        removeUser(id) { // User追加
+            if (this.lst[id]) {
+                this.users = this.users.filter(usr => usr.userid != id);
+                delete this.lst[id];
+            }
+        }
+    
+    }
+    
+    var resultslist = new ResultList();
+    
+    /*
+        quiz.jsonの形式
+        [
+            {
+                text1: "2020クイズ大会",
+                image1: "white.jpg",
+                A: "A",
+                B: "B",
+                correct: "",
+            },
+            {
+                ...
+            }
+        ];
+    */
+        // 答えをA/B変更する
+        function changeAnswer() {
+            var a = document.getElementById("correct").value;
+            if (a=="B") {
+                a = "A";
+            } else {
+                a = "B";
+            }
+            document.getElementById("correct").value = a
+        }
+        var currentquestion = {};
+        var qindex = {};
+        var currentqno = 0;
+        var qindexlen = 0;
+        (function () {
+            fetch(jsonFileName) // ファイルから問題を読み込む [{image1, text1},{},...]
+            .then(response => response.json())
+            .then(data => {
+                // select の option を組み立て
+                var html = "";
+                qindexlen = 0;
+                data.forEach(q=>{
+                    html += "<option value='"+q.name+"'>"+q.name+"</option>";
+                    qindex[q.name] = q;
+                    qindexlen++;
+                })
+                document.getElementById("question").innerHTML = html;
+                document.getElementById('question').options[0].selected = true; // 一番目を選択
+                changeQuestion2();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        })();
+        // 次の問題 次へ
+        function nextQuestion() {
+            var q = currentqno;
+            q++;
+            if (q>=qindexlen) {
+                q = 0;
+            }
+            currentqno = q;
+            document.getElementById('question').options[q].selected = true; // 選択
+            changeQuestion2();
+        }
+        // 次の問題 戻る
+        function backQuestion() {
+            var q = currentqno;
+            q--;
+            if (q<0) {
+                q = qindexlen - 1;
+            }
+            currentqno = q;
+            document.getElementById('question').options[q].selected = true; // 選択
+             changeQuestion2();
+        }
+        // 次の問題を表示する
+        function changeQuestion2() {
+            var q = qindex[document.getElementById("question").value];
+            document.getElementById("image102").src = q.image2 || q.image1;
+            document.getElementById("text102").innerText = q.text1;
+            document.getElementById("A02").innerText = q.A;
+            document.getElementById("B02").innerText = q.B;
+            document.getElementById("correct02").innerText = q.correct;
+        }
+        // 質問が変更された。現在の質問として、管理者画面に表示する
+        function changeQuestion1() {
+            var q = qindex[document.getElementById("question").value];
+            currentquestion = q; // 現在選択中の質問
+            document.getElementById("image1").src = q.image2 || q.image1;
+            document.getElementById("text1").innerText = q.text1;
+            document.getElementById("A").innerText = q.A;
+            document.getElementById("B").innerText = q.B;
+            document.getElementById("correct").value = q.correct;
+        }
+    
+        // WebSocketのクライアントの生成
+        var wsock = new WebSocket(servername)
+
+        // open
+        function connect(){
+            wsock.send(JSON.stringify({
+                MSGTYPE: "HOST",
+                room: roomname,
+                name: document.getElementById("gamename").value,
+            }));
+        }
+    
+        // 接続時
+        wsock.addEventListener('open', e => {
+            console.log('open');
+            connect();
+        })
+        // クローズ時
+        wsock.addEventListener('close', e => {
+            console.log('close');
+        })
+    
+        // 正解発表・答え合わせ
+        function makeResult() {
+            var q = currentquestion;
+            var correct = document.getElementById("correct").value;
+            var qtext = q.text1+"("+correct+":"+q[correct]+")";
+    
+            resultslist.users.forEach(client => {
+                var result = {}
+                if (client.getResult(qtext, correct)) { // 正解
+                    result = {
+                        text1: "やったね！",
+                        image1: "right.jpg"
+                    }
+                } else {
+                    result = {
+                        text1: "ざんねん！",
+                        image1: "wrong.jpg"
+                    } 
+                }
+                wsock.send(JSON.stringify({
+                    MSGTYPE: "MESSAGE",
+                    type: "result!",
+                    sendto: client.userid,
+                    result: result,
+                }));
+            });
+    
+            document.getElementById("userlist").innerHTML = resultslist.htmlUsers();
+            resultslist.push(); // 現在の状態を履歴に退避、次の問題に備える
+            document.getElementById("resultlist").innerHTML = resultslist.htmlResultsList();
+    
+            // クライアントに一覧を送る
+            resultslist.users.forEach(client => {
+                var rlist = [];
+                resultslist.getResultlist().forEach(ulist=>{
+                    var user = ulist.find(e => e.userid == client.userid);
+                    if (user) {
+                        rlist.push(user)
+                    }
+                })
+                wsock.send(JSON.stringify({
+                    MSGTYPE: "MESSAGE",
+                    type:"resultslist!",
+                    sendto: client.userid,
+                    resultslist: rlist,
+                }));
+            })
+        }
+        var count_a = 0;
+        var count_b = 0;
+    
+        // 現在の問題を送信
+        function sendCurQuestion(sendto) {
+            wsock.send(JSON.stringify({
+                MSGTYPE: "MESSAGE",
+                type: "question!",
+                sendto: sendto,
+                question: currentquestion,
+            }))
+        }
+        // ステータスをクリアーして、現在の問題を送信
+        function clearAndSendQuestion() {
+            changeQuestion1();
+            timestamp.clear();
+            count_a = 0;
+            count_b = 0;
+            resultslist.clear();
+            sendCurQuestion(""); // 問題を全員に送信
+        }
+    
+        // サーバからのデータ受信時に呼ばれる
+        wsock.addEventListener('message', e => {
+            console.log(e.data)
+            var msg = {};
+            try {
+                msg = JSON.parse(e.data)
+            } catch (error) {
+                return;
+            }
+    
+            if (msg.MSGTYPE == "LEAVE") {
+                resultslist.removeUser(msg.from);
+                document.getElementById("userlist").innerHTML = resultslist.htmlUsers();// 一覧の書き換え
+                return;
+            }
+            // ユーザー回答の処理
+            switch (msg.type) {
+                case "server?":
+                    resultslist.addUser(msg.from).setUsername(msg.name);
+                    // クライアントに返信
+                    wsock.send(JSON.stringify({
+                        MSGTYPE: "MESSAGE",
+                        type: "server!",
+                        sendto: msg.from,　// 差出人に返信
+                        name: document.getElementById("gamename").value,
+                    }));
+                    document.getElementById("userlist").innerHTML = resultslist.htmlUsers();// 一覧の書き換え
+                    sendCurQuestion(msg.from);    // 現在実行中の問題を送る
+                    break;
+                case "answer?":
+                    resultslist.addUser(msg.from).setAnswer(msg.answer)
+                    document.getElementById("userlist").innerHTML = resultslist.htmlUsers();// 一覧の書き換え
+            
+                    var answer = msg.answer;
+                    if (answer == "A") {
+                        count_a++;
+                    }
+                    if (answer == "B") {
+                        count_b++;
+                    }
+                    wsock.send(JSON.stringify({
+                        MSGTYPE: "MESSAGE",
+                        type: "answer!",
+                        sendto: "",　// 全員
+                        data: {count_a, count_b, answer},
+                    }));
+                    break;
+            }
+        })
+    
+        </script>
+    </div>
+</body>
+</html>
