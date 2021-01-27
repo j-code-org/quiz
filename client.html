@@ -352,8 +352,11 @@ table th {
 // Global vars
 var urlvars = getUrlVars();
 var servername = urlvars["server"];
-var roomname = urlvars["room"];
-var username = decodeURI(urlvars["user"]);
+var roomname = urlvars["room"] || "QUIZ2020@j-code.org";
+var username = (urlvars["user"])?decodeURI(urlvars["user"]) : "A"+(Math.floor(Math.random()*900)+100)+" no name";
+
+console.log("roomname:",roomname)
+
 document.getElementById("username").value = username;
 
     // クラスを設定して、アニメーションを開始する
@@ -419,7 +422,7 @@ document.getElementById("username").value = username;
 
     // サーバからのデータ受信時に呼ばれる
     wsock.addEventListener('message', e => {
-        console.log(e.data)
+        //console.log(e.data)
         var msg = {};
         try {
             msg = JSON.parse(e.data)
@@ -430,7 +433,7 @@ document.getElementById("username").value = username;
         case "server!": // サーバーから返事が来たので、join を出す
             serverid = msg.from;　// サーバーのIDを保管する
             document.getElementById("serverpanel").style.display = "none"; // サーバーリストを非表示
-            console.log("serveropen", serverid)
+            //console.log("serveropen", serverid)
             break;
         case "question!":
             var q = msg.question;
