@@ -6,6 +6,16 @@
 <title>プログラミング教育研究所</title>
 <link rel="stylesheet" href="https://j-code.org/css/bulma.css">
 <link rel="stylesheet" href="https://j-code.org/css/style.css">
+<audio id="sound-quiz" preload="auto">
+	<source src="quiz.mp3" type="audio/mp3">
+</audio>
+<audio id="sound-right" preload="auto">
+	<source src="right.mp3" type="audio/mp3">
+</audio>
+<audio id="sound-wrong" preload="auto">
+	<source src="wrong.mp3" type="audio/mp3">
+</audio>
+
 <style>
 *,
 *:before,
@@ -355,8 +365,6 @@ var servername = urlvars["server"];
 var roomname = urlvars["room"] || "QUIZ2020@j-code.org";
 var username = (urlvars["user"])?decodeURI(urlvars["user"]) : "A"+(Math.floor(Math.random()*900)+100)+" no name";
 
-console.log("roomname:",roomname)
-
 document.getElementById("username").value = username;
 
     // クラスを設定して、アニメーションを開始する
@@ -450,6 +458,7 @@ document.getElementById("username").value = username;
             } else {
                 document.getElementById("image2outer").style.display = "none";
             }
+            document.getElementById('sound-quiz').play();
             break;
         case "answer!":
             var data = msg.data;
@@ -466,6 +475,11 @@ document.getElementById("username").value = username;
             var q = msg.result;
             document.getElementById("image1").src = q.image1;
             document.getElementById("text1").innerText = q.text1;
+            if (q.text1 == "やったね！") {
+                document.getElementById('sound-right').play();
+            } else if (q.text1 == "ざんねん！") {
+                document.getElementById('sound-wrong').play();
+            }
             break;
         case "resultslist!":
             var html = "<table>"
